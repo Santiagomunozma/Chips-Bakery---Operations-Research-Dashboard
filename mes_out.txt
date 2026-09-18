@@ -1,0 +1,144 @@
+Análisis de Producción y Demanda
+Empresa de Galletería Artesanal
+Informe organizado de producción, demanda, ingresos, costos y resultados financieros.
+Fecha:
+ Septiembre de 2026
+────────────────────────────
+Introducción
+El presente informe organiza la información histórica de producción y demanda de una empresa de galletería artesanal, con el fin de analizar el comportamiento de las unidades vendidas, los sobrantes, los ingresos, los costos y la ganancia o pérdida obtenida durante un periodo de diez meses.
+1. Matriz de Producción y Resultados
+Mes
+Nivel Producido (di)
+Demanda Real Observada
+Unidades Vendidas
+Unidades Sobrantes
+Ingreso Total ($)
+Costo Total ($)
+Ganancia / Pérdida ($)
+Mes 1
+100
+100 unidades
+100
+0
+$500
+$300
+$200
+Mes 2
+250
+250 unidades
+250
+0
+$1,250
+$750
+$500
+Mes 3
+400
+400 unidades
+400
+0
+$2,000
+$1,200
+$800
+Mes 4
+250
+100 unidades
+100
+150
+$500
+$750
+-$250
+Mes 5
+400
+400 unidades
+400
+0
+$2,000
+$1,200
+$800
+Mes 6
+400
+100 unidades
+100
+300
+$500
+$1,200
+-$700
+Mes 7
+250
+250 unidades
+250
+0
+$1,250
+$750
+$500
+Mes 8
+400
+400 unidades
+400
+0
+$2,000
+$1,200
+$800
+Mes 9
+250
+250 unidades
+250
+0
+$1,250
+$750
+$500
+Mes 10
+400
+400 unidades
+400
+0
+$2,000
+$1,200
+$800
+2. Identidad de la Empresa
+Objeto Social:
+ La elaboración, transformación, empaque, distribución y comercialización al por mayor y al detal de productos de panadería y galletería artesanal e industrial, así como la gestión integral de su cadena de suministro, optimización de insumos alimentarios y desarrollo de nuevos formatos de snacks horneados.
+Misión:
+ Ofrecer galletas artesanales de alta calidad con ingredientes seleccionados, optimizando nuestros procesos de producción para garantizar frescura, minimizar el desperdicio alimentario y brindar momentos únicos de deleite a nuestros consumidores.
+Visión:
+ Para el año 2030, consolidarnos como la galletería líder en la región mediante el uso de modelos analíticos e ingeniería de decisiones, manteniendo una operación sostenible, cero desperdicios e innovación constante en recetas y logística.
+3. Cálculo de Probabilidades
+3.1 ¿
+De 
+dónde
+ salen los PS?
+Las probabilidades a priori de los estados de la naturaleza fueron obtenidas directamente mediante la 
+frecuencia relativa histórica
+ del registro de producción de los últimos 10 meses (Matriz de Producción Pasada):
+Demanda Baja (
+S
+1
+=100
+ galletas
+):
+ Se observó en los Meses 1, 4 y 6 (3 veces de 10).
+P
+S
+1
+=
+3
+10
+=0.30
+ 
+30%
+Demanda Alta (
+S
+2
+≥250
+ galletas
+):
+ Se observó en los Meses 2, 3, 5, 7, 8, 9 y 10 (7 veces de 10).
+P
+S
+2
+=
+7
+10
+=0.70
+ 
+70%

@@ -1,6 +1,41 @@
-/Excel (2) (1).xlsx
-/gambit_out.txt
-/Informe_Teoria_de_Juegos_Gambit_Chips_Bakery_Completo.docx
-/Mes.docx
-/mes_out.txt
-/prompt_arquitectura.md
+# Dependencias y build
+node_modules/
+dist/
+dist-ssr/
+build/
+.vite/
+*.local
+
+# Entorno y secretos
+.env
+.env.*
+!.env.example
+
+# Logs y cobertura
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+coverage/
+.nyc_output/
+
+# Sistema y editores
+.DS_Store
+Thumbs.db
+Desktop.ini
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Cursor / local
+.cursor/
+.cursorignore
+
+# Python auxiliar
+__pycache__/
+*.pyc
+.venv/
+venv/

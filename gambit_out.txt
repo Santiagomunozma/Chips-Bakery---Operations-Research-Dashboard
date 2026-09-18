@@ -1,0 +1,79 @@
+INFORME TÉCNICO COMPLETO: TEORÍA DE JUEGOS EN GAMBIT
+Análisis Comparativo: Estrategia Pura (Punto de Silla) vs. Estrategia Mixta (Simulación de Mercado Hostil)
+Caso de Estudio: Chips Bakery vs. Mercado | Perspectiva de Ingeniería Informática
+1. Introducción y Marco Metodológico
+Como estudiantes de Ingeniería Informática, la Teoría de Juegos nos permite llevar la simulación de decisiones más allá del análisis probabilístico pasivo. Modelamos la interacción entre Chips Bakery (Jugador 1) y el Mercado (Jugador 2) mediante dos escenarios estocásticos en Gambit: el Modelo Base (Estrategia Pura con Punto de Silla) y un Escenario Extremo (Estrategia Mixta sin Punto de Silla).
+2. Escenario 1: Modelo Base (Estrategia Pura - Punto de Silla)
+En el caso base original del problema, la matriz de pagos en miles de dólares ($k) es:
+Estrategia Chips Bakery (J1)
+S1: Demanda Baja (J2)
+S2: Demanda Alta (J2)
+Mínimo Fila (Maximin)
+d1: Producir 100 galletas
+$200 k / -$200 k
+$200 k / -$200 k
+$200 k  <-- Maximin
+d2: Producir 250 galletas
+-$250 k / $250 k
+$500 k / -$500 k
+-$250 k
+d3: Producir 400 galletas
+-$700 k / $700 k
+$800 k / -$800 k
+-$700 k
+• Análisis Matemático: 
+Maximin = $200 k | Minimax = $200 k. Como Maximin = Minimax, el juego posee un Punto de Silla estricto en (d1, S1).
+• Resultado en Gambit (chips_bakery.nfg): 
+1:d1 = 1.0 (100%), 1:d2 = 0, 1:d3 = 0 | Valor del Juego = $200 k.
+• Interpretación: 
+La decisión óptima es 100% determinista. Para inmunitatse ante el peor comportamiento del mercado, la empresa debe producir 100 galletas (d1).
+3. Escenario 2: Modelo Extremo (Estrategia Mixta - Ausencia de Punto de Silla)
+Para simular un entorno de alta variabilidad competitiva donde ninguna estrategia domine absolutamente a la otra, modificamos la matriz de pagos en un subconjunto dinámico (d2 vs d3):
+Estrategia Chips Bakery (J1)
+S1: Demanda Baja (J2)
+S2: Demanda Alta (J2)
+Mínimo Fila (Maximin)
+d2: Producir 250 galletas
+$300 k / -$300 k
+$100 k / -$100 k
+$100 k  <-- Maximin
+d3: Producir 400 galletas
+-$100 k / $100 k
+$600 k / -$600 k
+-$100 k
+a) Demostración del Colapso de Punto de Silla:
+   • Maximin = Max(100, -100) = $100 k
+   • Minimax = Min(300, 600) = $300 k
+   • Como Maximin (100) ≠ Minimax (300), NO existe un punto de silla. Ningún jugador se conformará con una sola decisión pura.
+b) Resolución Algebraica de la Estrategia Mixta:
+   Igualamos los retornos esperados de Chips Bakery para volver indiferente la respuesta del Mercado:
+   • Retorno S1 = 300(p) - 100(1-p) = 400p - 100
+   • Retorno S2 = 100(p) + 600(1-p) = 600 - 500p
+   • Igualando: 400p - 100 = 600 - 500p  ⇒  900p = 700  ⇒  p = 7/9 ≈ 0.7778 (77.78%)
+   • 1 - p = 2/9 ≈ 0.2222 (22.22%)
+c) Valor Esperado del Juego bajo Estrategia Mixta:
+   • V_juego = 400(7/9) - 100 = 211.11 ($211.11 k)
+d) Resultado del Script en Gambit (chips_bakery_mixta.nfg):
+   • Perfil Chips Bakery: 1:d2 = 0.778 (77.8%), 1:d3 = 0.222 (22.2%)
+   • Perfil Mercado: 2:S1 = 0.556 (55.6%), 2:S2 = 0.444 (44.4%)
+   • Payoff Obtenido: $211.11 k
+4. Archivos de Configuración NFG para Gambit
+A continuación se adjunta el código fuente de los dos archivos .nfg empleados en la simulación:
+// --- ARCHIVO 1: chips_bakery.nfg (Estrategia Pura) ---
+NFG 1 R "Chips Bakery vs Mercado" { "Chips Bakery" "Mercado" } { { "d1" "d2" "d3" } { "S1 (Baja)" "S2 (Alta)" } }
+200 -200
+-250 250
+-700 700
+200 -200
+500 -500
+800 -800
+// --- ARCHIVO 2: chips_bakery_mixta.nfg (Estrategia Mixta / Escenario Extremo) ---
+NFG 1 R "Chips Bakery - Estrategia Mixta" { "Chips Bakery" "Mercado" } { { "d2 (250g)" "d3 (400g)" } { "S1 (Baja)" "S2 (Alta)" } }
+300 -300
+-100 100
+100 -100
+600 -600
+5. Conclusiones y Guía de Exposición
+💡 SÍNTESIS PARA LA SUSTENTACIÓN ANTE EL JURADO:
+1. Demostración de Rigurosidad: Presentar dos archivos .nfg en Gambit evidencia que entendemos cuándo un algoritmo converge a una solución determinista (Punto de Silla) y cuándo requiere programación lineal para encontrar una distribución de probabilidades en un entorno sin dominancia.
+2. Integración de Herramientas: Con SilverDecisions resolvimos la incertidumbre probabilística pasiva ($350 k con d3), con el Excel interactivo parametrizamos la sensibilidad (punto crítico al 40%), y con Gambit modelamos la respuesta óptima ante un adversario racional en estrategias puras ($200 k con d1) y mixtas ($211.11 k combinando d2 y d3).
