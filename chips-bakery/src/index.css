@@ -1,0 +1,44 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply antialiased font-sans;
+    background-color: #0f172a;
+    color: #f1f5f9;
+  }
+}
+
+@layer utilities {
+  .bg-brand-pink { background-color: #334155; }
+  .bg-brand-rose { background-color: #0f172a; }
+  .bg-brand-cream { background-color: #1e293b; }
+  .bg-brand-tan { background-color: #C48A4A; }
+  .text-brand-ink { color: #e2e8f0; }
+  .text-brand-muted { color: #94a3b8; }
+  .text-brand-tan { color: #E4B07A; }
+  .border-brand-pink { border-color: #334155; }
+  .border-brand-tan { border-color: #C48A4A; }
+  .border-l-brand-tan { border-left-color: #C48A4A; }
+  .accent-brand-tan { accent-color: #C48A4A; }
+  .bg-brand-rose\/60 { background-color: rgb(15 23 42 / 0.65); }
+  .bg-brand-rose\/50 { background-color: rgb(15 23 42 / 0.5); }
+  .border-brand-pink\/60 { border-color: #334155; }
+}
+
+.hover\:bg-brand-cream:hover { background-color: #1e293b; }
+.hover\:bg-brand-rose:hover { background-color: #334155; }
+.hover\:border-brand-tan:hover { border-color: #C48A4A; }
+.hover\:text-brand-ink:hover { color: #e2e8f0; }
+.hover\:text-brand-tan:hover { color: #E4B07A; }
+.focus\:border-brand-tan:focus { border-color: #C48A4A; }
+
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.25s ease-out;
+}
