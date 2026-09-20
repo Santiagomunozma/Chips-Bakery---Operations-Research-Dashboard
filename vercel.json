@@ -1,0 +1,7 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": "vite",
+  "installCommand": "npm install --prefix chips-bakery",
+  "buildCommand": "npm run build --prefix chips-bakery",
+  "outputDirectory": "chips-bakery/dist"
+}
