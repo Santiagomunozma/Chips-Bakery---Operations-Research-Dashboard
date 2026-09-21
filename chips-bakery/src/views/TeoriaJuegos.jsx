@@ -3,6 +3,7 @@ import { Gamepad2, TrendingUp, AlertTriangle, Copy, Check, RefreshCw } from 'luc
 import { useLab } from '../state/LabContext';
 import { formatK, formatPct } from '../model/format.js';
 import { DECISION_META } from '../model/params.js';
+import { AlgebraSteps, DominanceSteps, GameGraph, MixedGraph } from '../components/GameWalkthrough.jsx';
 
 function CellInput({ value, onChange, highlight, label }) {
   return (
@@ -51,7 +52,7 @@ function NfgBlock({ title, text }) {
 export default function TeoriaJuegos() {
   const [activeSubTab, setActiveSubTab] = useState('pura');
   const { result, setGameCell, syncGameFromLab, gameOverride, mixedMatrix, setMixedCell } = useLab();
-  const { gameMatrix, saddle, mixed, nfgPure, nfgMixed, decisions } = result;
+  const { gameMatrix, saddle, mixed, nfgPure, nfgMixed, decisions, gameWalk, mixedWalk } = result;
 
   return (
     <div className="space-y-8 animate-fade-in">
@@ -154,12 +155,29 @@ export default function TeoriaJuegos() {
                   <h4 className="text-amber-300 font-bold mb-2 flex items-center gap-2"><AlertTriangle size={16} /> No hay punto de silla</h4>
                   <p className="text-brand-ink text-sm leading-relaxed">
                     Maximin ({formatK(saddle.maximin)}) ≠ Minimax ({formatK(saddle.minimax)}).
-                    Ninguna estrategia pura es un equilibrio. Pasa a la pestaña de estrategia mixta.
+                    Ninguna estrategia pura es un equilibrio. El álgebra mixta y el gráfico de abajo se recalculan con la matriz editada.
                   </p>
                 </>
               )}
             </div>
           </div>
+
+          <AlgebraSteps steps={gameWalk.algebra} heading="Análisis algebraico del punto de silla" />
+          <DominanceSteps dominance={gameWalk.dominance} />
+          <GameGraph graph={gameWalk.graph} title="Análisis gráfico (3 × 2)" />
+
+          {!saddle.hasSaddle && gameWalk.residualMix && (
+            <div className="space-y-6">
+              <AlgebraSteps
+                steps={gameWalk.residualMix.steps}
+                heading={`Estrategia mixta del residual (${(gameWalk.graph2x2?.rowLabels ?? gameWalk.dominance.remaining.rowLabels).join(' vs ')})`}
+              />
+              {gameWalk.graph2x2 && (
+                <MixedGraph graph={gameWalk.graph2x2} title="Gráfico 2 × 2 del subjuego residual" />
+              )}
+            </div>
+          )}
+
           <NfgBlock title="chips_bakery.nfg (estrategia pura)" text={nfgPure} />
         </div>
       )}
@@ -232,6 +250,10 @@ export default function TeoriaJuegos() {
               </div>
             )}
           </div>
+          <AlgebraSteps steps={mixed.steps} heading="Análisis algebraico de la estrategia mixta" />
+          <DominanceSteps dominance={mixedWalk.dominance} />
+          <GameGraph graph={mixedWalk.graph} title="Análisis gráfico vs q = P(S1)" />
+          {mixedWalk.graph2x2 && <MixedGraph graph={mixedWalk.graph2x2} title="Gráfico 2 × 2 (p = P(d2))" />}
           <NfgBlock title="chips_bakery_mixta.nfg" text={nfgMixed} />
         </div>
       )}

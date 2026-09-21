@@ -211,6 +211,238 @@ export function saddlePoint(matrix) {
   };
 }
 
+export function fmtN(n) {
+  if (n == null || Number.isNaN(n)) return '—';
+  if (Math.abs(n - Math.round(n)) < 1e-9) return String(Math.round(n));
+  const r4 = Math.round(n * 10000) / 10000;
+  if (Math.abs(n - Math.round(n * 100) / 100) > 1e-6) return String(r4);
+  return String(Math.round(n * 100) / 100);
+}
+
+function paren(n) {
+  return n < 0 ? `(${fmtN(n)})` : fmtN(n);
+}
+
+export function lineEquation(slope, intercept, xName = 'q') {
+  if (Math.abs(slope) < 1e-12) return fmtN(intercept);
+  const absS = fmtN(Math.abs(slope));
+  const slopePart = slope < 0 ? `− ${absS}${xName}` : `${absS}${xName}`;
+  if (Math.abs(intercept) < 1e-12) return slope < 0 ? `−${absS}${xName}` : `${absS}${xName}`;
+  if (slope < 0) return `${fmtN(intercept)} ${slopePart}`;
+  return `${fmtN(intercept)} + ${slopePart}`;
+}
+
+function submatrix(matrix, rowIdx, colIdx) {
+  return rowIdx.map((i) => colIdx.map((j) => matrix[i][j]));
+}
+
+function rowDominates(rowA, rowB) {
+  let ge = true;
+  let gt = false;
+  let st = true;
+  for (let j = 0; j < rowA.length; j += 1) {
+    if (rowA[j] < rowB[j] - 1e-12) ge = false;
+    if (rowA[j] > rowB[j] + 1e-12) gt = true;
+    if (rowA[j] <= rowB[j] + 1e-12) st = false;
+  }
+  if (!ge || !gt) return null;
+  return st ? 'estricta' : 'débil';
+}
+
+function colDominates(colA, colB) {
+  let le = true;
+  let lt = false;
+  let st = true;
+  for (let i = 0; i < colA.length; i += 1) {
+    if (colA[i] > colB[i] + 1e-12) le = false;
+    if (colA[i] < colB[i] - 1e-12) lt = true;
+    if (colA[i] >= colB[i] - 1e-12) st = false;
+  }
+  if (!le || !lt) return null;
+  return st ? 'estricta' : 'débil';
+}
+
+function columnOf(matrix, j) {
+  return matrix.map((row) => row[j]);
+}
+
+export function saddleAlgebra(matrix, rowLabels, colLabels, saddle = null) {
+  const s = saddle ?? saddlePoint(matrix);
+  const steps = [];
+  steps.push({
+    title: 'Mínimo de cada fila (Chips, maximin)',
+    lines: matrix.map((row, i) => {
+      const shown = row.map(fmtN).join(', ');
+      return `${rowLabels[i]}: min(${shown}) = ${fmtN(s.rowMin[i])}`;
+    }),
+  });
+  steps.push({
+    title: 'Maximin',
+    lines: [
+      `max{${s.rowMin.map(fmtN).join(', ')}} = ${fmtN(s.maximin)}`,
+      `La mejor garantía en estrategia pura es ${rowLabels[s.maximinIdx]}.`,
+    ],
+  });
+  steps.push({
+    title: 'Máximo de cada columna (Mercado, minimax)',
+    lines: colLabels.map((lab, j) => {
+      const vals = matrix.map((row) => fmtN(row[j])).join(', ');
+      return `${lab}: max(${vals}) = ${fmtN(s.colMax[j])}`;
+    }),
+  });
+  steps.push({
+    title: 'Minimax',
+    lines: [
+      `min{${s.colMax.map(fmtN).join(', ')}} = ${fmtN(s.minimax)}`,
+      `La amenaza más barata para el mercado es ${colLabels[s.minimaxCol]}.`,
+    ],
+  });
+  if (s.hasSaddle) {
+    const cellLab = s.cell
+      ? `${rowLabels[s.cell.i]} contra ${colLabels[s.cell.j]}`
+      : `${rowLabels[s.maximinIdx]} contra ${colLabels[s.minimaxCol]}`;
+    steps.push({
+      title: 'Comparación: hay punto de silla',
+      lines: [
+        `Maximin = ${fmtN(s.maximin)} = Minimax = ${fmtN(s.minimax)}.`,
+        `Equilibrio en estrategias puras: ${cellLab}.`,
+        `Valor del juego v* = ${fmtN(s.cell?.value ?? s.maximin)}.`,
+      ],
+    });
+  } else {
+    steps.push({
+      title: 'Comparación: no hay punto de silla',
+      lines: [
+        `Maximin = ${fmtN(s.maximin)} ≠ Minimax = ${fmtN(s.minimax)}.`,
+        'Ninguna celda es a la vez mínimo de su fila y máximo de su columna.',
+        'Hace falta reducir por dominancia y, si el residual no tiene silla, estrategia mixta.',
+      ],
+    });
+  }
+  return steps;
+}
+
+function snapshotOf(matrix, rowIdx, colIdx, rowLabels, colLabels) {
+  return {
+    matrix: submatrix(matrix, rowIdx, colIdx),
+    rowIdx: [...rowIdx],
+    colIdx: [...colIdx],
+    rowLabels: rowIdx.map((i) => rowLabels[i]),
+    colLabels: colIdx.map((j) => colLabels[j]),
+  };
+}
+
+function findDominanceMove(reduced, rowLabs, colLabs) {
+  const m = reduced.length;
+  const n = reduced[0].length;
+  const tries = [
+    { kind: 'estricta', rows: true },
+    { kind: 'estricta', rows: false },
+    { kind: 'débil', rows: true },
+    { kind: 'débil', rows: false },
+  ];
+  for (const trySpec of tries) {
+    if (trySpec.rows) {
+      for (let i = 0; i < m; i += 1) {
+        for (let k = 0; k < m; k += 1) {
+          if (i === k) continue;
+          const t = rowDominates(reduced[i], reduced[k]);
+          if (t !== trySpec.kind) continue;
+          const comps = reduced[i].map((v, j) => `${fmtN(v)} ${v > reduced[k][j] + 1e-12 ? '>' : '≥'} ${fmtN(reduced[k][j])} (${colLabs[j]})`);
+          return {
+            player: 'fila',
+            type: t,
+            keeper: i,
+            drop: k,
+            title: `${rowLabs[i]} domina ${t === 'estricta' ? 'estrictamente' : 'débilmente'} a ${rowLabs[k]}`,
+            lines: [
+              `Comparación celda a celda: ${comps.join('; ')}.`,
+              `Se elimina la fila ${rowLabs[k]}.`,
+            ],
+          };
+        }
+      }
+    } else {
+      for (let j = 0; j < n; j += 1) {
+        for (let k = 0; k < n; k += 1) {
+          if (j === k) continue;
+          const t = colDominates(columnOf(reduced, j), columnOf(reduced, k));
+          if (t !== trySpec.kind) continue;
+          const comps = reduced.map((row, i) => `${fmtN(row[j])} ${row[j] < row[k] - 1e-12 ? '<' : '≤'} ${fmtN(row[k])} (${rowLabs[i]})`);
+          return {
+            player: 'columna',
+            type: t,
+            keeper: j,
+            drop: k,
+            title: `${colLabs[j]} domina ${t === 'estricta' ? 'estrictamente' : 'débilmente'} a ${colLabs[k]} (el mercado prefiere pagos menores)`,
+            lines: [
+              `Comparación fila a fila: ${comps.join('; ')}.`,
+              `Se elimina la columna ${colLabs[k]}.`,
+            ],
+          };
+        }
+      }
+    }
+  }
+  return null;
+}
+
+export function iterativeDominance(matrix, rowLabels, colLabels) {
+  let rowIdx = matrix.map((_, i) => i);
+  let colIdx = matrix[0].map((_, j) => j);
+  const steps = [];
+  steps.push({
+    title: 'Matriz inicial',
+    lines: ['Se busca una fila o columna dominada (estricta antes que débil; filas antes que columnas).'],
+    snapshot: snapshotOf(matrix, rowIdx, colIdx, rowLabels, colLabels),
+  });
+
+  let guard = 0;
+  while (guard < 20 && rowIdx.length >= 1 && colIdx.length >= 1 && (rowIdx.length > 1 || colIdx.length > 1)) {
+    guard += 1;
+    const reduced = submatrix(matrix, rowIdx, colIdx);
+    const rowLabs = rowIdx.map((i) => rowLabels[i]);
+    const colLabs = colIdx.map((j) => colLabels[j]);
+    const move = findDominanceMove(reduced, rowLabs, colLabs);
+    if (!move) break;
+    if (move.player === 'fila') {
+      const dropped = rowIdx[move.drop];
+      rowIdx = rowIdx.filter((_, i) => i !== move.drop);
+      steps.push({
+        title: move.title,
+        lines: move.lines.concat([`Quedan filas: ${rowIdx.map((i) => rowLabels[i]).join(', ')}.`]),
+        snapshot: snapshotOf(matrix, rowIdx, colIdx, rowLabels, colLabels),
+        eliminated: { kind: 'row', index: dropped, label: rowLabels[dropped], type: move.type },
+      });
+    } else {
+      const dropped = colIdx[move.drop];
+      colIdx = colIdx.filter((_, j) => j !== move.drop);
+      steps.push({
+        title: move.title,
+        lines: move.lines.concat([`Quedan columnas: ${colIdx.map((j) => colLabels[j]).join(', ')}.`]),
+        snapshot: snapshotOf(matrix, rowIdx, colIdx, rowLabels, colLabels),
+        eliminated: { kind: 'col', index: dropped, label: colLabels[dropped], type: move.type },
+      });
+    }
+  }
+
+  const remaining = snapshotOf(matrix, rowIdx, colIdx, rowLabels, colLabels);
+  const remSaddle = saddlePoint(remaining.matrix);
+  let conclusion;
+  if (rowIdx.length === 1 && colIdx.length === 1) {
+    conclusion = `Queda un subjuego 1×1. Equilibrio puro ${remaining.rowLabels[0]} contra ${remaining.colLabels[0]} con valor ${fmtN(remaining.matrix[0][0])}.`;
+  } else if (remSaddle.hasSaddle) {
+    conclusion = `El subjuego residual tiene punto de silla. Valor ${fmtN(remSaddle.maximin)} en ${remaining.rowLabels[remSaddle.cell?.i ?? remSaddle.maximinIdx]} contra ${remaining.colLabels[remSaddle.cell?.j ?? remSaddle.minimaxCol]}.`;
+  } else if (steps.length === 1) {
+    conclusion = 'Ninguna fila ni columna es dominada. El juego no se reduce; hay que resolver por silla o mixto sobre la matriz completa.';
+  } else {
+    conclusion = `El residual es ${rowIdx.length}×${colIdx.length} sin silla. Se resuelve por estrategia mixta / método gráfico.`;
+  }
+  steps.push({ title: 'Cierre de dominancia', lines: [conclusion], snapshot: remaining });
+
+  return { steps, remaining, eliminatedAny: steps.some((st) => st.eliminated) };
+}
+
 export function mixed2x2(matrix) {
   const a = matrix[0][0];
   const b = matrix[0][1];
@@ -219,22 +451,217 @@ export function mixed2x2(matrix) {
   const saddle = saddlePoint(matrix);
   const denP = a - c - b + d;
   const denQ = a - b - c + d;
-  const p = Math.abs(denP) < 1e-12 ? null : (d - c) / denP;
-  const q = Math.abs(denQ) < 1e-12 ? null : (d - b) / denQ;
-  const pClamped = p == null ? null : Math.min(1, Math.max(0, p));
-  const qClamped = q == null ? null : Math.min(1, Math.max(0, q));
+  const pRaw = Math.abs(denP) < 1e-12 ? null : (d - c) / denP;
+  const qRaw = Math.abs(denQ) < 1e-12 ? null : (d - b) / denQ;
+  const p = pRaw == null ? null : Math.min(1, Math.max(0, pRaw));
+  const q = qRaw == null ? null : Math.min(1, Math.max(0, qRaw));
   let value = null;
-  if (pClamped != null) {
-    value = pClamped * a + (1 - pClamped) * c;
+  if (p != null) value = p * a + (1 - p) * c;
+  const validMix = p != null && q != null && p > 0 && p < 1 && q > 0 && q < 1 && !saddle.hasSaddle;
+
+  const steps = [];
+  steps.push({
+    title: 'Indiferencia del mercado (p*)',
+    lines: [
+      `Chips juega la primera fila con probabilidad p y la segunda con 1 − p.`,
+      `Se igualan los pagos esperados de las dos columnas:`,
+      `p·${paren(a)} + (1−p)·${paren(c)} = p·${paren(b)} + (1−p)·${paren(d)}`,
+      `p* = (d − c) / (a − c − b + d) = (${fmtN(d)} − ${paren(c)}) / (${fmtN(a)} − ${paren(c)} − ${paren(b)} + ${fmtN(d)})`,
+      Math.abs(denP) < 1e-12
+        ? 'El denominador es 0: las columnas son paralelas; no hay mixto interior por esta vía.'
+        : `p* = ${fmtN(d - c)} / ${fmtN(denP)} = ${fmtN(pRaw)}.`,
+    ],
+  });
+  steps.push({
+    title: 'Indiferencia de Chips (q*)',
+    lines: [
+      `El mercado juega S1 con probabilidad q y S2 con 1 − q.`,
+      `Se igualan los pagos esperados de las dos filas:`,
+      `q·${paren(a)} + (1−q)·${paren(b)} = q·${paren(c)} + (1−q)·${paren(d)}`,
+      `q* = (d − b) / (a − b − c + d) = (${fmtN(d)} − ${paren(b)}) / (${fmtN(a)} − ${paren(b)} − ${paren(c)} + ${fmtN(d)})`,
+      Math.abs(denQ) < 1e-12
+        ? 'El denominador es 0: las filas son paralelas; no hay mixto interior por esta vía.'
+        : `q* = ${fmtN(d - b)} / ${fmtN(denQ)} = ${fmtN(qRaw)}.`,
+    ],
+  });
+  if (saddle.hasSaddle) {
+    steps.push({
+      title: 'Valor (estrategia pura)',
+      lines: [`Hay silla: v* = ${fmtN(saddle.maximin)}. El mixto interior no aplica.`],
+    });
+  } else if (validMix) {
+    const vCol1 = p * a + (1 - p) * c;
+    const vCol2 = p * b + (1 - p) * d;
+    const vRow1 = q * a + (1 - q) * b;
+    steps.push({
+      title: 'Valor del juego v*',
+      lines: [
+        `v* = p*·a + (1−p*)·c = ${fmtN(p)}·${paren(a)} + ${fmtN(1 - p)}·${paren(c)} = ${fmtN(vCol1)}`,
+        `Comprobación columna S2: p*·b + (1−p*)·d = ${fmtN(p)}·${paren(b)} + ${fmtN(1 - p)}·${paren(d)} = ${fmtN(vCol2)}`,
+        `Comprobación fila 1: q*·a + (1−q*)·b = ${fmtN(q)}·${paren(a)} + ${fmtN(1 - q)}·${paren(b)} = ${fmtN(vRow1)}`,
+        `Las tres vías coinciden (salvo redondeo). Maximin ${fmtN(saddle.maximin)} < v* < Minimax ${fmtN(saddle.minimax)}.`,
+      ],
+    });
+  } else {
+    steps.push({
+      title: 'Sin mixto interior',
+      lines: [
+        pRaw == null || qRaw == null
+          ? 'Denominador nulo: no se puede igualar al rival.'
+          : `p* = ${fmtN(pRaw)} o q* = ${fmtN(qRaw)} cae fuera de (0, 1). El equilibrio no es mixto interior.`,
+      ],
+    });
   }
+
   return {
     a, b, c, d,
-    p: pClamped,
-    q: qClamped,
+    denP,
+    denQ,
+    pRaw,
+    qRaw,
+    p,
+    q,
     value,
     saddle,
-    validMix: pClamped != null && qClamped != null && pClamped > 0 && pClamped < 1,
+    validMix,
+    steps,
   };
+}
+
+function expectedRowQ(row, q) {
+  return q * row[0] + (1 - q) * row[1];
+}
+
+export function graphicalMx2(matrix, rowLabels) {
+  const equations = matrix.map((row, i) => {
+    const intercept = row[1];
+    const slope = row[0] - row[1];
+    return {
+      id: rowLabels[i],
+      intercept,
+      slope,
+      text: `E(${rowLabels[i]}) = ${lineEquation(slope, intercept, 'q')}`,
+      at: (q) => intercept + slope * q,
+    };
+  });
+
+  const crossings = [];
+  for (let i = 0; i < matrix.length; i += 1) {
+    for (let j = i + 1; j < matrix.length; j += 1) {
+      const q = crossing(matrix[i], matrix[j]);
+      if (q == null) continue;
+      const v = expectedRowQ(matrix[i], q);
+      crossings.push({ i, j, q, v, labels: [rowLabels[i], rowLabels[j]] });
+    }
+  }
+
+  const candidates = [0, 1, ...crossings.map((c) => c.q)];
+  const unique = [];
+  candidates.forEach((q) => {
+    if (!unique.some((u) => Math.abs(u - q) < 1e-9)) unique.push(q);
+  });
+
+  const evaluated = unique.map((q) => {
+    const vals = matrix.map((row) => expectedRowQ(row, q));
+    const mx = Math.max(...vals);
+    const active = vals.map((v, i) => (Math.abs(v - mx) < 1e-6 ? i : -1)).filter((i) => i >= 0);
+    return { q, v: mx, active };
+  });
+
+  const isEnd = (q) => q < 1e-9 || q > 1 - 1e-9;
+  let best = evaluated[0];
+  evaluated.forEach((pt) => {
+    if (pt.v < best.v - 1e-9) {
+      best = pt;
+      return;
+    }
+    if (Math.abs(pt.v - best.v) > 1e-9) return;
+    if (isEnd(pt.q) && !isEnd(best.q)) {
+      best = pt;
+      return;
+    }
+    if (isEnd(best.q) && !isEnd(pt.q)) return;
+    if (pt.active.length < best.active.length) best = pt;
+    else if (pt.active.length === best.active.length && Math.abs(pt.q - 0.5) < Math.abs(best.q - 0.5)) best = pt;
+  });
+
+  const chartData = [];
+  for (let i = 0; i <= 100; i += 1) {
+    const q = i / 100;
+    const point = { q, envelope: Math.max(...matrix.map((row) => expectedRowQ(row, q))) };
+    rowLabels.forEach((lab, idx) => {
+      point[lab] = expectedRowQ(matrix[idx], q);
+    });
+    chartData.push(point);
+  }
+
+  return {
+    equations,
+    crossings,
+    qStar: best.q,
+    vStar: best.v,
+    activeRows: best.active,
+    activeLabels: best.active.map((i) => rowLabels[i]),
+    chartData,
+    note: 'Cada recta es el pago de una estrategia pura de Chips si el mercado juega S1 con probabilidad q. El mercado elige q que minimiza la envolvente superior; Chips responde con las filas que tocan ese punto.',
+  };
+}
+
+export function graphical2x2(matrix, rowLabels, colLabels, mixed = null) {
+  const mix = mixed ?? mixed2x2(matrix);
+  const a = matrix[0][0];
+  const b = matrix[0][1];
+  const c = matrix[1][0];
+  const d = matrix[1][1];
+  const s1 = { intercept: c, slope: a - c };
+  const s2 = { intercept: d, slope: b - d };
+  const equations = [
+    { id: colLabels[0], intercept: s1.intercept, slope: s1.slope, text: `E(${colLabels[0]}) = ${lineEquation(s1.slope, s1.intercept, 'p')}` },
+    { id: colLabels[1], intercept: s2.intercept, slope: s2.slope, text: `E(${colLabels[1]}) = ${lineEquation(s2.slope, s2.intercept, 'p')}` },
+  ];
+  const chartData = [];
+  for (let i = 0; i <= 100; i += 1) {
+    const p = i / 100;
+    chartData.push({
+      p,
+      [colLabels[0]]: s1.intercept + s1.slope * p,
+      [colLabels[1]]: s2.intercept + s2.slope * p,
+    });
+  }
+  const pStar = mix.validMix ? mix.p : mix.saddle.hasSaddle ? (mix.saddle.cell?.i === 0 ? 1 : 0) : mix.p;
+  const vStar = mix.validMix ? mix.value : mix.saddle.hasSaddle ? mix.saddle.maximin : mix.value;
+  return {
+    equations,
+    chartData,
+    pStar,
+    vStar,
+    rowLabels,
+    colLabels,
+    validMix: mix.validMix,
+    note: `Eje p = P(${rowLabels[0]}). Las dos rectas son el pago esperado si el mercado se queda en cada columna. El cruce es el mixto que hace al mercado indiferente.`,
+  };
+}
+
+export function gameWalkthrough(matrix, rowLabels, colLabels) {
+  const saddle = saddlePoint(matrix);
+  const algebra = saddleAlgebra(matrix, rowLabels, colLabels, saddle);
+  const dominance = iterativeDominance(matrix, rowLabels, colLabels);
+  const graph = graphicalMx2(matrix, rowLabels);
+  const rem = dominance.remaining;
+  let residualMix = null;
+  let graph2x2 = null;
+
+  if (rem.rowIdx.length === 2 && rem.colIdx.length === 2) {
+    residualMix = mixed2x2(rem.matrix);
+    graph2x2 = graphical2x2(rem.matrix, rem.rowLabels, rem.colLabels, residualMix);
+  } else if (!saddle.hasSaddle && graph.activeRows.length === 2 && matrix[0].length === 2) {
+    const sub = graph.activeRows.map((i) => matrix[i]);
+    const labs = graph.activeRows.map((i) => rowLabels[i]);
+    residualMix = mixed2x2(sub);
+    graph2x2 = graphical2x2(sub, labs, colLabels, residualMix);
+  }
+
+  return { saddle, algebra, dominance, graph, residualMix, graph2x2 };
 }
 
 export function nfgPure(matrix) {
@@ -296,6 +723,10 @@ export function analyze({ params, history, mixedMatrix, gameOverride }) {
   const bayes = bayesAnalysis(params, matrix);
   const saddle = saddlePoint(gameMatrix);
   const mixed = mixed2x2(mixedMatrix);
+  const gameRowLabels = DECISION_META.map((m) => m.short);
+  const gameColLabels = ['S1', 'S2'];
+  const gameWalk = gameWalkthrough(gameMatrix, gameRowLabels, gameColLabels);
+  const mixedWalk = gameWalkthrough(mixedMatrix, ['d2', 'd3'], gameColLabels);
   const rows = historyRows(history, params);
   const freq = frequencyFromHistory(history, params);
 
@@ -319,6 +750,8 @@ export function analyze({ params, history, mixedMatrix, gameOverride }) {
     bayes,
     saddle,
     mixed,
+    gameWalk,
+    mixedWalk,
     nfgPure: nfgPure(gameMatrix),
     nfgMixed: nfgMixed(mixedMatrix),
     historyRows: rows,
