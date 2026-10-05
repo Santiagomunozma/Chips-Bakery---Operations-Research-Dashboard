@@ -5,6 +5,7 @@ import ContextoEmpresarial from './views/ContextoEmpresarial';
 import InferenciaBayesiana from './views/InferenciaBayesiana';
 import AnalisisSensibilidad from './views/AnalisisSensibilidad';
 import TeoriaJuegos from './views/TeoriaJuegos';
+import LineasDeEspera from './views/LineasDeEspera';
 import { LabProvider } from './state/LabContext';
 
 function Dashboard() {
@@ -16,6 +17,7 @@ function Dashboard() {
       case 'inferencia': return <InferenciaBayesiana />;
       case 'sensibilidad': return <AnalisisSensibilidad />;
       case 'juegos': return <TeoriaJuegos />;
+      case 'colas': return <LineasDeEspera />;
       default: return <ContextoEmpresarial />;
     }
   };

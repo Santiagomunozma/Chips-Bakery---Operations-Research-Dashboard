@@ -702,6 +702,59 @@ export function historyRows(history, params) {
   });
 }
 
+function factorial(n) {
+  let value = 1;
+  for (let i = 2; i <= n; i += 1) value *= i;
+  return value;
+}
+
+export function poissonPmf(lambda, x) {
+  const k = Math.round(x);
+  if (k < 0 || lambda < 0) return null;
+  return (lambda ** k) * Math.exp(-lambda) / factorial(k);
+}
+
+export function mm1(lambda, mu) {
+  const rho = mu > 0 ? lambda / mu : Infinity;
+  const stable = lambda >= 0 && mu > 0 && lambda < mu;
+  const serviceCdf = (t) => (mu > 0 && t >= 0 ? 1 - Math.exp(-mu * t) : null);
+  if (!stable) {
+    return {
+      lambda,
+      mu,
+      rho,
+      stable: false,
+      p0: null,
+      lq: null,
+      l: null,
+      wq: null,
+      w: null,
+      pw: null,
+      pn: () => null,
+      serviceCdf,
+    };
+  }
+  const p0 = 1 - rho;
+  const lq = (lambda * lambda) / (mu * (mu - lambda));
+  const l = lq + rho;
+  const wq = lambda === 0 ? 0 : lq / lambda;
+  const w = wq + 1 / mu;
+  return {
+    lambda,
+    mu,
+    rho,
+    stable: true,
+    p0,
+    lq,
+    l,
+    wq,
+    w,
+    pw: rho,
+    pn: (n) => (rho ** n) * p0,
+    serviceCdf,
+  };
+}
+
 export function frequencyFromHistory(history, params) {
   const nBaja = history.filter((row) => row.demand <= params.s1).length;
   const n = history.length || 1;

@@ -41,6 +41,15 @@ export const PRESETS = {
   },
 };
 
+/** Ventanilla M/M/1 del ejemplo de clase: λ = 0.75 clientes/min, μ = 1. */
+export const DEFAULT_QUEUE = {
+  lambda: 0.75,
+  mu: 1,
+  n: 3,
+  x: 0,
+  t: 1,
+};
+
 export const DECISION_META = [
   { id: 'd1', key: 'd1', label: 'd1: Producir 100', short: 'd1', qtyKey: 'd1' },
   { id: 'd2', key: 'd2', label: 'd2: Producir 250', short: 'd2', qtyKey: 'd2' },

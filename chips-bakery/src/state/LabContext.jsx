@@ -3,6 +3,7 @@ import {
   DEFAULT_HISTORY,
   DEFAULT_MIXED_MATRIX,
   DEFAULT_PARAMS,
+  DEFAULT_QUEUE,
   PRESETS,
 } from '../model/params.js';
 import { analyze, frequencyFromHistory } from '../model/engine.js';
@@ -18,6 +19,7 @@ export function LabProvider({ children }) {
   const [history, setHistoryState] = useState(DEFAULT_HISTORY);
   const [mixedMatrix, setMixedMatrixState] = useState(() => cloneMatrix(DEFAULT_MIXED_MATRIX));
   const [gameOverride, setGameOverride] = useState(null);
+  const [queue, setQueueState] = useState(DEFAULT_QUEUE);
 
   const result = useMemo(
     () => analyze({ params, history, mixedMatrix, gameOverride }),
@@ -62,11 +64,16 @@ export function LabProvider({ children }) {
     setGameOverride(null);
   }, []);
 
+  const setQueue = useCallback((patch) => {
+    setQueueState((prev) => ({ ...prev, ...patch }));
+  }, []);
+
   const reset = useCallback(() => {
     setParamsState(DEFAULT_PARAMS);
     setHistoryState(DEFAULT_HISTORY);
     setMixedMatrixState(cloneMatrix(DEFAULT_MIXED_MATRIX));
     setGameOverride(null);
+    setQueueState(DEFAULT_QUEUE);
   }, []);
 
   const applyPreset = useCallback((key) => {
@@ -87,6 +94,8 @@ export function LabProvider({ children }) {
       gameOverride,
       setGameCell,
       syncGameFromLab,
+      queue,
+      setQueue,
       reset,
       applyPreset,
       result,
@@ -102,6 +111,8 @@ export function LabProvider({ children }) {
       gameOverride,
       setGameCell,
       syncGameFromLab,
+      queue,
+      setQueue,
       reset,
       applyPreset,
       result,

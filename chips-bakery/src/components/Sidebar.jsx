@@ -1,11 +1,12 @@
 import React from 'react';
-import { Home, Binary, Activity, UserCog } from 'lucide-react';
+import { Home, Binary, Activity, UserCog, Clock } from 'lucide-react';
 
 const navItems = [
   { id: 'contexto', label: 'Contexto Empresarial', icon: Home },
   { id: 'inferencia', label: 'Inferencia Bayesiana', icon: Binary },
   { id: 'sensibilidad', label: 'Análisis Sensibilidad', icon: Activity },
   { id: 'juegos', label: 'Teoría de Juegos', icon: UserCog },
+  { id: 'colas', label: 'Líneas de espera', icon: Clock },
 ];
 
 export default function Sidebar({ activeTab, setActiveTab }) {
