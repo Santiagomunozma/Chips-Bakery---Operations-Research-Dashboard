@@ -58,7 +58,7 @@ export default function TeoriaJuegos() {
     <div className="space-y-8 animate-fade-in">
       <div className="flex justify-between items-center border-b border-brand-pink pb-4">
         <div>
-          <h2 className="text-3xl font-bold text-brand-ink">Teoría de Juegos (Minimax)</h2>
+          <h2 className="text-2xl md:text-3xl font-bold text-brand-ink">Teoría de Juegos (Minimax)</h2>
           <p className="text-brand-muted text-sm mt-1">Equilibrios que se resolvieron en Gambit; el dashboard los recalcula y exporta el .nfg</p>
         </div>
       </div>

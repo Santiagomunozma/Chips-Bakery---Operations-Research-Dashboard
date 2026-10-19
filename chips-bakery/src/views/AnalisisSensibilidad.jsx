@@ -24,7 +24,7 @@ export default function AnalisisSensibilidad() {
     <div className="space-y-8 animate-fade-in">
       <div className="flex justify-between items-center border-b border-brand-pink pb-4">
         <div>
-          <h2 className="text-3xl font-bold text-brand-ink">Análisis de Sensibilidad</h2>
+          <h2 className="text-2xl md:text-3xl font-bold text-brand-ink">Análisis de Sensibilidad</h2>
           <p className="text-brand-muted text-sm mt-1">El cruce se deriva de los payoffs. El segundo preset es el caso del Excel: obras frente al local, menos clientes, P(baja)=70%</p>
         </div>
       </div>
@@ -88,7 +88,7 @@ export default function AnalisisSensibilidad() {
         })}
       </div>
 
-      <div className="bg-brand-cream p-6 rounded-xl border border-brand-pink h-96">
+      <div className="bg-brand-cream p-4 md:p-6 rounded-xl border border-brand-pink h-72 md:h-96">
         <h3 className="text-brand-ink font-semibold mb-4 text-sm">Valor Esperado vs Probabilidad de Demanda Baja</h3>
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={sensitivity.chartData} margin={{ top: 10, right: 30, left: 0, bottom: 20 }}>

@@ -13,7 +13,7 @@ export default function InferenciaBayesiana() {
     <div className="space-y-8 animate-fade-in">
       <div className="flex justify-between items-center border-b border-brand-pink pb-4">
         <div>
-          <h2 className="text-3xl font-bold text-brand-ink">Inferencia Bayesiana</h2>
+          <h2 className="text-2xl md:text-3xl font-bold text-brand-ink">Inferencia Bayesiana</h2>
           <p className="text-brand-muted text-sm mt-1">Mismos números que el Excel y que el árbol de SilverDecisions; aquí se pueden mover con el laboratorio</p>
         </div>
       </div>

@@ -41,13 +41,34 @@ export const PRESETS = {
   },
 };
 
-/** Ventanilla M/M/1 del ejemplo de clase: λ = 0.75 clientes/min, μ = 1. */
+/** Caso de clase 8: M/M/2, λ = 0.75 clientes/min, μ = 1 por canal. */
 export const DEFAULT_QUEUE = {
   lambda: 0.75,
   mu: 1,
-  n: 3,
+  c: 2,
+  n: 5,
   x: 0,
   t: 1,
+};
+
+/**
+ * Muestra fija de la ventanilla. 180 llegadas en 240 minutos → λ = 0.75.
+ * La media de los tiempos de servicio es 1 minuto → μ = 1 por canal.
+ */
+export const QUEUE_SAMPLE = {
+  minutes: 240,
+  arrivals: 180,
+  windows: [
+    { day: 'Sábado 4 oct', slot: '10:00–10:30', minutes: 30, arrivals: 22 },
+    { day: 'Sábado 4 oct', slot: '10:30–11:00', minutes: 30, arrivals: 24 },
+    { day: 'Sábado 4 oct', slot: '11:00–11:30', minutes: 30, arrivals: 21 },
+    { day: 'Sábado 4 oct', slot: '11:30–12:00', minutes: 30, arrivals: 23 },
+    { day: 'Sábado 11 oct', slot: '10:00–10:30', minutes: 30, arrivals: 20 },
+    { day: 'Sábado 11 oct', slot: '10:30–11:00', minutes: 30, arrivals: 25 },
+    { day: 'Sábado 11 oct', slot: '11:00–11:30', minutes: 30, arrivals: 23 },
+    { day: 'Sábado 11 oct', slot: '11:30–12:00', minutes: 30, arrivals: 22 },
+  ],
+  serviceTimes: [0.4, 0.6, 0.8, 0.9, 1.0, 1.1, 1.2, 1.4, 0.7, 1.5, 0.5, 1.3, 0.8, 1.0, 1.6, 0.9, 1.1, 0.6, 1.2, 1.4],
 };
 
 export const DECISION_META = [

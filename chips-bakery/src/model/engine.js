@@ -714,14 +714,28 @@ export function poissonPmf(lambda, x) {
   return (lambda ** k) * Math.exp(-lambda) / factorial(k);
 }
 
-export function mm1(lambda, mu) {
-  const rho = mu > 0 ? lambda / mu : Infinity;
-  const stable = lambda >= 0 && mu > 0 && lambda < mu;
+function pnAt(p0, r, servers, n) {
+  const k = Math.round(n);
+  if (k < 0 || p0 == null) return null;
+  let value = p0;
+  for (let i = 1; i <= k; i += 1) {
+    value *= r / (i <= servers ? i : servers);
+  }
+  return value;
+}
+
+export function mmc(lambda, mu, c) {
+  const servers = Math.max(1, Math.round(Number(c) || 1));
+  const r = mu > 0 ? lambda / mu : Infinity;
+  const rho = mu > 0 ? lambda / (servers * mu) : Infinity;
+  const stable = lambda >= 0 && mu > 0 && Number.isFinite(rho) && rho < 1;
   const serviceCdf = (t) => (mu > 0 && t >= 0 ? 1 - Math.exp(-mu * t) : null);
   if (!stable) {
     return {
       lambda,
       mu,
+      c: servers,
+      r,
       rho,
       stable: false,
       p0: null,
@@ -731,17 +745,36 @@ export function mm1(lambda, mu) {
       w: null,
       pw: null,
       pn: () => null,
+      pAtLeast: () => null,
       serviceCdf,
     };
   }
-  const p0 = 1 - rho;
-  const lq = (lambda * lambda) / (mu * (mu - lambda));
-  const l = lq + rho;
+
+  let sum = 0;
+  for (let n = 0; n < servers; n += 1) {
+    sum += (r ** n) / factorial(n);
+  }
+  const tail = (r ** servers) / (factorial(servers) * (1 - rho));
+  const p0 = 1 / (sum + tail);
+  const pw = tail * p0;
+  const lq = (p0 * (r ** servers) * rho) / (factorial(servers) * (1 - rho) ** 2);
+  const l = lq + r;
   const wq = lambda === 0 ? 0 : lq / lambda;
   const w = wq + 1 / mu;
+  const pn = (n) => pnAt(p0, r, servers, n);
+  const pAtLeast = (n) => {
+    const k = Math.round(n);
+    if (k <= 0) return 1;
+    let below = 0;
+    for (let i = 0; i < k; i += 1) below += pn(i);
+    return Math.max(0, 1 - below);
+  };
+
   return {
     lambda,
     mu,
+    c: servers,
+    r,
     rho,
     stable: true,
     p0,
@@ -749,10 +782,15 @@ export function mm1(lambda, mu) {
     l,
     wq,
     w,
-    pw: rho,
-    pn: (n) => (rho ** n) * p0,
+    pw,
+    pn,
+    pAtLeast,
     serviceCdf,
   };
+}
+
+export function mm1(lambda, mu) {
+  return mmc(lambda, mu, 1);
 }
 
 export function frequencyFromHistory(history, params) {

@@ -46,7 +46,7 @@ export default function LabPanel() {
 
   return (
     <section className="bg-brand-cream rounded-xl border border-brand-pink mb-6">
-      <div className="flex items-center justify-between px-4 py-3 border-b border-brand-pink">
+      <div className="flex flex-wrap items-center justify-between gap-2 px-4 py-3 border-b border-brand-pink">
         <div className="flex items-center gap-3 min-w-0">
           <SlidersHorizontal size={16} className="text-brand-tan shrink-0" />
           <div className="min-w-0">
@@ -77,7 +77,7 @@ export default function LabPanel() {
       {open && (
         <div className="p-4 grid grid-cols-1 lg:grid-cols-12 gap-4">
           <div className="lg:col-span-3 space-y-3">
-            <div className="flex gap-2">
+            <div className="flex flex-col sm:flex-row gap-2">
               {Object.entries(PRESETS).map(([key, preset]) => (
                 <button
                   key={key}

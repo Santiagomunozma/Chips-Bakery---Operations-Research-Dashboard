@@ -18,7 +18,7 @@ export default function ContextoEmpresarial() {
     <div className="space-y-8 animate-fade-in">
       <div className="flex justify-between items-center border-b border-brand-pink pb-4">
         <div>
-          <h2 className="text-3xl font-bold text-brand-ink">Contexto Empresarial</h2>
+          <h2 className="text-2xl md:text-3xl font-bold text-brand-ink">Contexto Empresarial</h2>
           <p className="text-brand-muted text-sm mt-1">Fuente: Mes.docx y hoja de datos del Excel</p>
         </div>
       </div>
@@ -177,7 +177,7 @@ export default function ContextoEmpresarial() {
         </div>
       </div>
 
-      <div className="bg-brand-cream p-6 rounded-xl border border-brand-pink h-80">
+      <div className="bg-brand-cream p-4 md:p-6 rounded-xl border border-brand-pink h-64 md:h-80">
         <h3 className="text-brand-ink font-semibold mb-2 text-sm">Ganancia y sobrantes por mes</h3>
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={chartData} margin={{ top: 8, right: 12, left: 0, bottom: 8 }}>

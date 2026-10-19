@@ -23,9 +23,9 @@ function Dashboard() {
   };
 
   return (
-    <div className="flex bg-slate-900 min-h-screen">
+    <div className="min-h-screen bg-slate-900 md:flex">
       <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
-      <main className="flex-1 ml-64 p-8">
+      <main className="min-w-0 flex-1 md:ml-64 p-4 md:p-8">
         <div className="max-w-6xl mx-auto">
           <LabPanel />
           {renderView()}

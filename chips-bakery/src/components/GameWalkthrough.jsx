@@ -31,7 +31,7 @@ function colorFor(id, i = 0) {
 
 export function AlgebraSteps({ steps, heading = 'Análisis algebraico' }) {
   return (
-    <div className="bg-brand-cream p-6 rounded-xl border border-brand-pink space-y-4">
+    <div className="bg-brand-cream p-4 md:p-6 rounded-xl border border-brand-pink space-y-4">
       <h3 className="text-xl font-semibold text-brand-ink">{heading}</h3>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {steps.map((step) => (
@@ -79,7 +79,7 @@ function MiniMatrix({ snapshot }) {
 
 export function DominanceSteps({ dominance }) {
   return (
-    <div className="bg-brand-cream p-6 rounded-xl border border-brand-pink space-y-4">
+    <div className="bg-brand-cream p-4 md:p-6 rounded-xl border border-brand-pink space-y-4">
       <h3 className="text-xl font-semibold text-brand-ink">Método de dominancia</h3>
       <p className="text-sm text-brand-muted">
         Se eliminan filas y columnas dominadas. Una fila domina a otra si paga al menos igual en todas las columnas y más en alguna.
@@ -123,7 +123,7 @@ function ChartTooltip({ active, payload, label, xName }) {
 export function GameGraph({ graph, title = 'Análisis gráfico (m × 2)' }) {
   const keys = graph.equations.map((eq) => eq.id);
   return (
-    <div className="bg-brand-cream p-6 rounded-xl border border-brand-pink space-y-4">
+    <div className="bg-brand-cream p-4 md:p-6 rounded-xl border border-brand-pink space-y-4">
       <h3 className="text-xl font-semibold text-brand-ink">{title}</h3>
       <p className="text-sm text-brand-ink leading-relaxed">{graph.note}</p>
       <ul className="text-sm font-mono text-brand-ink space-y-1">
@@ -135,7 +135,7 @@ export function GameGraph({ graph, title = 'Análisis gráfico (m × 2)' }) {
         Óptimo gráfico: <strong>q* = {fmtN(graph.qStar)}</strong> (P(S1)), valor <strong>{formatK(graph.vStar, 2)}</strong>.
         Filas activas: {graph.activeLabels.join(', ') || '—'}.
       </p>
-      <div className="h-96">
+      <div className="h-72 md:h-96">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={graph.chartData} margin={{ top: 12, right: 24, left: 8, bottom: 24 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
@@ -177,7 +177,7 @@ export function MixedGraph({ graph, title = 'Análisis gráfico 2 × 2' }) {
   const c0 = graph.colLabels[0];
   const c1 = graph.colLabels[1];
   return (
-    <div className="bg-brand-cream p-6 rounded-xl border border-brand-pink space-y-4">
+    <div className="bg-brand-cream p-4 md:p-6 rounded-xl border border-brand-pink space-y-4">
       <h3 className="text-xl font-semibold text-brand-ink">{title}</h3>
       <p className="text-sm text-brand-ink leading-relaxed">{graph.note}</p>
       <ul className="text-sm font-mono text-brand-ink space-y-1">
@@ -190,7 +190,7 @@ export function MixedGraph({ graph, title = 'Análisis gráfico 2 × 2' }) {
           Cruce: <strong>p* = {fmtN(graph.pStar)}</strong> (P({graph.rowLabels[0]})), valor <strong>{formatK(graph.vStar, 2)}</strong>.
         </p>
       )}
-      <div className="h-96">
+      <div className="h-72 md:h-96">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={graph.chartData} margin={{ top: 12, right: 24, left: 8, bottom: 24 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
