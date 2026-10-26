@@ -4,6 +4,7 @@ import { useLab } from '../state/LabContext';
 import { formatK, formatPct } from '../model/format.js';
 import { DECISION_META } from '../model/params.js';
 import { AlgebraSteps, DominanceSteps, GameGraph, MixedGraph } from '../components/GameWalkthrough.jsx';
+import CompetitiveGame from '../components/CompetitiveGame.jsx';
 
 function CellInput({ value, onChange, highlight, label }) {
   return (
@@ -50,7 +51,7 @@ function NfgBlock({ title, text }) {
 }
 
 export default function TeoriaJuegos() {
-  const [activeSubTab, setActiveSubTab] = useState('pura');
+  const [activeSubTab, setActiveSubTab] = useState('competencia');
   const { result, setGameCell, syncGameFromLab, gameOverride, mixedMatrix, setMixedCell } = useLab();
   const { gameMatrix, saddle, mixed, nfgPure, nfgMixed, decisions, gameWalk, mixedWalk } = result;
 
@@ -58,12 +59,18 @@ export default function TeoriaJuegos() {
     <div className="space-y-8 animate-fade-in">
       <div className="flex justify-between items-center border-b border-brand-pink pb-4">
         <div>
-          <h2 className="text-2xl md:text-3xl font-bold text-brand-ink">Teoría de Juegos (Minimax)</h2>
-          <p className="text-brand-muted text-sm mt-1">Equilibrios que se resolvieron en Gambit; el dashboard los recalcula y exporta el .nfg</p>
+          <h2 className="text-2xl md:text-3xl font-bold text-brand-ink">Teoría de Juegos</h2>
+          <p className="text-brand-muted text-sm mt-1">Matriz competitiva, estrategias mixtas y modelo de producción</p>
         </div>
       </div>
 
-      <div className="flex space-x-2 border-b border-brand-pink pb-2">
+      <div className="flex flex-wrap gap-2 border-b border-brand-pink pb-2">
+        <button
+          onClick={() => setActiveSubTab('competencia')}
+          className={`px-4 py-2 rounded-t-lg font-medium transition-colors ${activeSubTab === 'competencia' ? 'bg-brand-tan text-white' : 'text-brand-muted hover:text-brand-ink hover:bg-brand-rose'}`}
+        >
+          Matriz competitiva y clientes
+        </button>
         <button
           onClick={() => setActiveSubTab('pura')}
           className={`px-4 py-2 rounded-t-lg font-medium transition-colors ${activeSubTab === 'pura' ? 'bg-brand-tan text-white' : 'text-brand-muted hover:text-brand-ink hover:bg-brand-rose'}`}
@@ -77,6 +84,8 @@ export default function TeoriaJuegos() {
           Estrategia Mixta
         </button>
       </div>
+
+      {activeSubTab === 'competencia' && <CompetitiveGame />}
 
       {activeSubTab === 'pura' && (
         <div className="space-y-6 animate-fade-in">

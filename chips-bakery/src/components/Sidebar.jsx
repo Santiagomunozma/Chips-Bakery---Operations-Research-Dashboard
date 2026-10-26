@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Home, Binary, Activity, UserCog, Clock, Menu, X } from 'lucide-react';
+import { Home, Binary, Activity, UserCog, Clock, GitBranch, Menu, X } from 'lucide-react';
 
 const navItems = [
   { id: 'contexto', label: 'Contexto Empresarial', icon: Home },
@@ -7,6 +7,7 @@ const navItems = [
   { id: 'sensibilidad', label: 'Análisis Sensibilidad', icon: Activity },
   { id: 'juegos', label: 'Teoría de Juegos', icon: UserCog },
   { id: 'colas', label: 'Líneas de espera', icon: Clock },
+  { id: 'rutas', label: 'Análisis de Ruta', icon: GitBranch },
 ];
 
 function NavButtons({ activeTab, onChoose }) {
