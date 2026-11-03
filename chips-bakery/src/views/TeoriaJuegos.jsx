@@ -4,6 +4,7 @@ import { useLab } from '../state/LabContext';
 import { formatK, formatPct } from '../model/format.js';
 import { DECISION_META } from '../model/params.js';
 import { AlgebraSteps, DominanceSteps, GameGraph, MixedGraph } from '../components/GameWalkthrough.jsx';
+import GraphicalGameAnalysis from '../components/GraphicalGameAnalysis.jsx';
 import CompetitiveGame from '../components/CompetitiveGame.jsx';
 
 function CellInput({ value, onChange, highlight, label }) {
@@ -63,6 +64,8 @@ export default function TeoriaJuegos() {
           <p className="text-brand-muted text-sm mt-1">Matriz competitiva, estrategias mixtas y modelo de producción</p>
         </div>
       </div>
+
+      <GraphicalGameAnalysis />
 
       <div className="flex flex-wrap gap-2 border-b border-brand-pink pb-2">
         <button
