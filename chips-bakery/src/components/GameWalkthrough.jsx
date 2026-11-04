@@ -49,7 +49,7 @@ export function AlgebraSteps({ steps, heading = 'Análisis algebraico' }) {
   );
 }
 
-function MiniMatrix({ snapshot }) {
+function MiniMatrix({ snapshot, divisor = 1 }) {
   if (!snapshot?.matrix?.length) return null;
   return (
     <div className="overflow-x-auto mt-3">
@@ -67,7 +67,7 @@ function MiniMatrix({ snapshot }) {
             <tr key={snapshot.rowLabels[i]}>
               <td className="p-2 border border-brand-pink text-left font-bold text-brand-ink">{snapshot.rowLabels[i]}</td>
               {row.map((v, j) => (
-                <td key={`${i}-${j}`} className="p-2 border border-brand-pink text-brand-ink">{fmtN(v)}</td>
+                <td key={`${i}-${j}`} className="p-2 border border-brand-pink text-brand-ink">{fmtN(v / divisor)}</td>
               ))}
             </tr>
           ))}
@@ -94,11 +94,14 @@ export function DominanceSteps({ dominance }) {
               <p key={line} className="text-sm text-brand-ink leading-relaxed">{line}</p>
             ))}
             {step.eliminated && (
-              <p className="text-xs text-amber-700 mt-2">
+              <p className="text-xs text-amber-300 mt-2">
                 Eliminada: {step.eliminated.label} ({step.eliminated.type})
               </p>
             )}
-            <MiniMatrix snapshot={step.snapshot} />
+            <MiniMatrix
+              snapshot={step.snapshot}
+              divisor={step.title === 'Cierre de dominancia' ? 100 : 1}
+            />
           </li>
         ))}
       </ol>

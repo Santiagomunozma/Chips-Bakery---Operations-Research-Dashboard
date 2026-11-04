@@ -2,6 +2,7 @@ import React from 'react';
 import { COMPETITIVE_DOMINANCE, COMPETITIVE_MIXED, COMPETITIVE_PAYOFF_MATRIX, COMPETITIVE_STRATEGIES, CUSTOMER_TRIALS, summarizeCustomerTrials } from '../model/competitiveGame.js';
 import { formatPct } from '../model/format.js';
 import { DominanceSteps } from './GameWalkthrough.jsx';
+import GraphicalGameAnalysis from './GraphicalGameAnalysis.jsx';
 
 function Metric({ label, value, detail }) {
   return (
@@ -191,6 +192,7 @@ export default function CompetitiveGame() {
 
       <DominanceSteps dominance={COMPETITIVE_DOMINANCE} />
       <MixedStrategyResults />
+      <GraphicalGameAnalysis />
       <CustomerHistory />
     </div>
   );
