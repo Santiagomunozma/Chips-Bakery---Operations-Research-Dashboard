@@ -2,6 +2,7 @@ import React from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { useLab } from '../state/LabContext';
 import { formatK, formatMoney, formatPct } from '../model/format.js';
+import PaymentMatrix from '../components/PaymentMatrix.jsx';
 
 export default function ContextoEmpresarial() {
   const { params, result, updateHistoryRow } = useLab();
@@ -23,15 +24,6 @@ export default function ContextoEmpresarial() {
         </div>
       </div>
 
-      <div className="bg-brand-cream p-6 rounded-xl border border-brand-pink">
-        <h3 className="text-lg font-semibold text-brand-tan mb-3">El problema de decisión</h3>
-        <p className="text-brand-ink text-sm leading-relaxed">
-          Chips Bakery debe fijar la producción del próximo periodo (100, 250 o 400 galletas) sin conocer la demanda.
-          Si produce de más, las unidades sobrantes se descartan por la política <span className="text-brand-ink font-medium">Horneado Hoy, Fresco Hoy</span> (merma total al costo).
-          Si produce de menos, deja de vender pero no pierde efectivo extra. El laboratorio de la derecha cambia precio, costo y cantidades; la matriz de pagos se reescribe sola.
-        </p>
-      </div>
-
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="bg-brand-cream p-6 rounded-xl border border-brand-pink">
           <h3 className="text-xl font-semibold text-brand-tan mb-3">Misión</h3>
@@ -46,11 +38,20 @@ export default function ContextoEmpresarial() {
           </p>
         </div>
         <div className="bg-brand-cream p-6 rounded-xl border border-brand-pink lg:col-span-2">
-          <h3 className="text-xl font-semibold text-brand-tan mb-3">Objeto Social</h3>
+          <h3 className="text-xl font-semibold text-brand-tan mb-3">Objetivo social</h3>
           <p className="text-brand-ink leading-relaxed text-sm">
             La elaboración, transformación, empaque, distribución y comercialización al por mayor y al detal de productos de panadería y galletería artesanal e industrial, así como la gestión integral de su cadena de suministro, optimización de insumos alimentarios y desarrollo de nuevos formatos de snacks horneados.
           </p>
         </div>
+      </div>
+
+      <div className="bg-brand-cream p-6 rounded-xl border border-brand-pink">
+        <h3 className="text-lg font-semibold text-brand-tan mb-3">El problema de decisión</h3>
+        <p className="text-brand-ink text-sm leading-relaxed">
+          Chips Bakery debe fijar la producción del próximo periodo (100, 250 o 400 galletas) sin conocer la demanda.
+          Si produce de más, las unidades sobrantes se descartan por la política <span className="text-brand-ink font-medium">Horneado Hoy, Fresco Hoy</span> (merma total al costo).
+          Si produce de menos, deja de vender pero no pierde efectivo extra. El laboratorio de Inferencia Bayesiana permite cambiar precio, costo y cantidades; la matriz de pagos se actualiza con esos valores.
+        </p>
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -73,30 +74,7 @@ export default function ContextoEmpresarial() {
       </div>
 
       <div className="bg-brand-cream p-6 rounded-xl border border-brand-pink">
-        <h3 className="text-lg font-semibold text-brand-ink mb-2">Matriz de pagos (precio × vendidas − costo × producidas)</h3>
-        <p className="text-xs text-brand-muted mb-4">Se actualiza con el laboratorio. Los valores coinciden con el Excel en el caso base (200, −250, 500, −700, 800).</p>
-        <div className="overflow-x-auto rounded-lg border border-brand-pink">
-          <table className="w-full text-center text-sm">
-            <thead className="bg-brand-rose text-brand-ink">
-              <tr>
-                <th className="p-3 text-left">Alternativa</th>
-                <th className="p-3">S1 baja ({params.s1})</th>
-                <th className="p-3">S2 alta ({params.s2})</th>
-                <th className="p-3">VE @ {formatPct(params.pS1, 0)}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {decisions.map((d, i) => (
-                <tr key={d.id} className={`border-t border-brand-pink ${i === result.bestIdx ? 'bg-emerald-900/20' : ''}`}>
-                  <td className="p-3 text-left font-semibold text-brand-ink">{d.label}</td>
-                  <td className="p-3 text-brand-ink">{formatK(matrix[i][0])}</td>
-                  <td className="p-3 text-brand-ink">{formatK(matrix[i][1])}</td>
-                  <td className={`p-3 font-bold ${i === result.bestIdx ? 'text-emerald-400' : 'text-brand-ink'}`}>{formatK(d.ev)}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <PaymentMatrix decisions={decisions} matrix={matrix} params={params} bestIdx={result.bestIdx} />
       </div>
 
       <div className="bg-brand-cream p-6 rounded-xl border border-brand-pink">

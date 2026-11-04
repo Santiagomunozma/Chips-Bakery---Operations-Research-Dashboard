@@ -29,11 +29,6 @@ function formatDecimal(value) {
   return decimalFormatter.format(Math.abs(value) < 0.0005 ? 0 : value);
 }
 
-function formatEquation(line) {
-  const sign = line.intercept < 0 ? '−' : '+';
-  return `E(${line.scenarioLabel}, ${line.label}) = ${formatDecimal(line.slope)}p ${sign} ${formatDecimal(Math.abs(line.intercept))}`;
-}
-
 function PayoffInput({ scenarioId, lineKey, endpoint, value, onChange, scenarioLabel, lineLabel }) {
   const inputId = `${scenarioId}-${lineKey}-${endpoint}`;
   return (
@@ -174,9 +169,6 @@ function DoubleAxisGraph({ analysis, probability, hoveredLine, onLineHover }) {
             const endY = payoffY(line.atOne);
             return (
               <g key={line.id}>
-                <title>
-                  {`${formatEquation(line)}; pagos extremos ${formatDecimal(line.atZero)} y ${formatDecimal(line.atOne)}`}
-                </title>
                 <line
                   x1={GRAPH.left}
                   y1={startY}
@@ -348,44 +340,8 @@ export default function GraphicalGameAnalysis() {
             )}
           </div>
 
-          <div className="rounded-lg border border-brand-pink bg-brand-rose/50 p-4">
-            <h4 className="font-semibold text-brand-ink">Ecuaciones y puntos de cruce</h4>
-            <ul className="mt-3 space-y-2">
-              {analysis.lines.map((line, index) => (
-                <li key={line.id} style={{ color: LINE_COLORS[index] }} className="font-mono text-xs leading-relaxed">
-                  {formatEquation(line)}
-                </li>
-              ))}
-            </ul>
-            <div className="mt-4 space-y-3 border-t border-brand-pink pt-3">
-              {analysis.intersections.map((intersection) => (
-                <div key={intersection.id} className="text-sm text-brand-ink">
-                  <p className="font-semibold text-brand-tan">{intersection.label}</p>
-                  {intersection.p == null ? (
-                    <p className="mt-1 text-xs text-brand-muted">Las rectas son paralelas; no hay un cruce único.</p>
-                  ) : (
-                    <>
-                      <p className="mt-1 font-mono text-xs">
-                        p* = {formatDecimal(intersection.p)} · q* = 1 − p* = {formatDecimal(intersection.q)}
-                      </p>
-                      <p className="mt-1 text-xs text-brand-muted">
-                        (q*, p*) = ({probabilityFormatter.format(intersection.q)}, {probabilityFormatter.format(intersection.p)})
-                        {' · '}pago = {formatDecimal(intersection.value)}
-                        {!intersection.withinProbabilityRange && ' · fuera del intervalo [0, 1]'}
-                      </p>
-                    </>
-                  )}
-                </div>
-              ))}
-            </div>
-          </div>
         </aside>
       </div>
-
-      <p className="rounded-lg border border-brand-pink bg-brand-rose/40 p-3 text-xs leading-relaxed text-brand-muted">
-        Para cada recta se interpola E(p) = m p + b, con b = E(0) y m = E(1) − E(0). El cruce de dos rectas satisface
-        {' '}m₁p + b₁ = m₂p + b₂; por tanto p* = (b₂ − b₁)/(m₁ − m₂), q* = 1 − p*. La pareja del boceto se presenta como (q*, p*).
-      </p>
     </section>
   );
 }

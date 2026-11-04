@@ -1,5 +1,4 @@
 import React from 'react';
-import GraphicalGameAnalysis from '../components/GraphicalGameAnalysis.jsx';
 import CompetitiveGame from '../components/CompetitiveGame.jsx';
 
 export default function TeoriaJuegos() {
@@ -12,7 +11,6 @@ export default function TeoriaJuegos() {
         </div>
       </div>
 
-      <GraphicalGameAnalysis />
       <CompetitiveGame />
     </div>
   );

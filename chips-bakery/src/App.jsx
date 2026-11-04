@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import Sidebar from './components/Sidebar';
-import LabPanel from './components/LabPanel';
 import ContextoEmpresarial from './views/ContextoEmpresarial';
 import InferenciaBayesiana from './views/InferenciaBayesiana';
 import AnalisisSensibilidad from './views/AnalisisSensibilidad';
@@ -29,7 +28,6 @@ function Dashboard() {
       <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
       <main className="min-w-0 flex-1 md:ml-64 p-4 md:p-8">
         <div className="max-w-6xl mx-auto">
-          <LabPanel />
           {renderView()}
         </div>
       </main>

@@ -1,13 +1,15 @@
 import React from 'react';
-import { Target, Scale, Shield, AlertTriangle } from 'lucide-react';
+import { Scale, Shield, AlertTriangle } from 'lucide-react';
 import { useLab } from '../state/LabContext';
 import DecisionTree from '../components/DecisionTree';
+import LabPanel from '../components/LabPanel';
+import PaymentMatrix from '../components/PaymentMatrix.jsx';
 import { formatK, formatPct } from '../model/format.js';
 import { DECISION_META } from '../model/params.js';
 
 export default function InferenciaBayesiana() {
   const { params, result } = useLab();
-  const { criteria, bayes, decisions } = result;
+  const { criteria, bayes } = result;
 
   return (
     <div className="space-y-8 animate-fade-in">
@@ -18,18 +20,11 @@ export default function InferenciaBayesiana() {
         </div>
       </div>
 
+      <LabPanel />
+
       <div className="bg-brand-cream p-6 rounded-xl border border-brand-pink">
-        <h3 className="text-xl font-semibold text-brand-tan mb-4 flex items-center gap-2">
-          <Target className="text-brand-tan" /> Alternativas de Producción
-        </h3>
-        <ul className="list-disc pl-6 space-y-2 text-brand-muted text-sm">
-          {decisions.map((d) => (
-            <li key={d.id}>
-              <strong className="text-brand-ink">{d.label} galletas.</strong>{' '}
-              Payoff baja {formatK(d.payoffs[0])} · alta {formatK(d.payoffs[1])} · VE {formatK(d.ev)}.
-            </li>
-          ))}
-        </ul>
+        <h3 className="text-xl font-semibold text-brand-tan mb-4">Matriz de pagos</h3>
+        <PaymentMatrix decisions={result.decisions} matrix={result.matrix} params={params} bestIdx={result.bestIdx} />
       </div>
 
       <div>
@@ -51,11 +46,12 @@ export default function InferenciaBayesiana() {
             <p className="text-sm text-brand-muted mt-1">Minimax regret: {formatK(criteria.regret.value)}</p>
           </div>
         </div>
+        <h4 className="mt-5 text-base font-semibold text-brand-ink">Tabla de arrepentimiento (Regret)</h4>
         <div className="mt-4 overflow-x-auto rounded-lg border border-brand-pink">
           <table className="w-full text-sm text-center">
             <thead className="bg-brand-rose text-brand-ink">
               <tr>
-                <th className="p-3 text-left">Regret</th>
+                <th className="p-3 text-left">Alternativa</th>
                 <th className="p-3">S1</th>
                 <th className="p-3">S2</th>
                 <th className="p-3">Máximo fila</th>
@@ -72,29 +68,6 @@ export default function InferenciaBayesiana() {
               ))}
             </tbody>
           </table>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
-        <div className="bg-brand-cream p-5 rounded-xl border border-brand-pink">
-          <p className="text-brand-muted text-sm font-semibold">VE sin estudio</p>
-          <p className="text-3xl font-bold text-brand-ink mt-1">{formatK(bayes.ve)}</p>
-          <p className="text-xs text-brand-muted mt-2">Mejor a priori: {bayes.noStudyId}</p>
-        </div>
-        <div className="bg-brand-cream p-5 rounded-xl border border-brand-pink">
-          <p className="text-brand-muted text-sm font-semibold">VEIP (info perfecta)</p>
-          <p className="text-3xl font-bold text-brand-ink mt-1">{formatK(bayes.veip)}</p>
-          <p className="text-xs text-brand-muted mt-2">Vale {formatK(bayes.veipDelta)} más que el VE</p>
-        </div>
-        <div className="bg-brand-cream p-5 rounded-xl border border-brand-pink">
-          <p className="text-brand-muted text-sm font-semibold">VEOD (estudio / muestral)</p>
-          <p className="text-3xl font-bold text-emerald-400 mt-1">{formatK(bayes.veod)}</p>
-          <p className="text-xs text-brand-muted mt-2">No es información perfecta</p>
-        </div>
-        <div className="bg-brand-cream p-5 rounded-xl border-l-4 border-l-brand-tan">
-          <p className="text-brand-tan text-sm font-semibold">IVEM</p>
-          <p className="text-3xl font-black text-brand-tan mt-1">{formatK(bayes.ivem)}</p>
-          <p className="text-xs text-brand-muted mt-2">Máximo a pagar por el estudio. Eficiencia {formatPct(bayes.efficiency, 1)}</p>
         </div>
       </div>
 
@@ -154,6 +127,36 @@ export default function InferenciaBayesiana() {
           En el trabajo se armó en SilverDecisions. Aquí es el mismo árbol, recalculado: favorable → {bayes.fId}, desfavorable → {bayes.uId}, sin estudio → {bayes.noStudyId}.
         </p>
         <DecisionTree bayes={bayes} />
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+        <div className="bg-brand-cream p-5 rounded-xl border border-brand-pink">
+          <p className="text-brand-muted text-sm font-semibold">VE sin estudio</p>
+          <p className="text-3xl font-bold text-brand-ink mt-1">{formatK(bayes.ve)}</p>
+          <p className="text-xs text-brand-muted mt-2">Mejor a priori: {bayes.noStudyId}</p>
+        </div>
+        <div className="bg-brand-cream p-5 rounded-xl border border-brand-pink">
+          <p className="text-brand-muted text-sm font-semibold">VEIP (info perfecta)</p>
+          <p className="text-3xl font-bold text-brand-ink mt-1">{formatK(bayes.veip)}</p>
+          <p className="text-xs text-brand-muted mt-2">Vale {formatK(bayes.veipDelta)} más que el VE</p>
+        </div>
+        <div className="bg-brand-cream p-5 rounded-xl border border-brand-pink">
+          <p className="text-brand-muted text-sm font-semibold">VEOD (estudio / muestral)</p>
+          <p className="text-3xl font-bold text-emerald-400 mt-1">{formatK(bayes.veod)}</p>
+          <p className="text-xs text-brand-muted mt-2">No es información perfecta</p>
+        </div>
+        <div className="bg-brand-cream p-5 rounded-xl border-l-4 border-l-brand-tan">
+          <p className="text-brand-tan text-sm font-semibold">IVEM</p>
+          <p className="text-3xl font-black text-brand-tan mt-1">{formatK(bayes.ivem)}</p>
+          <p className="text-xs text-brand-muted mt-2">Máximo a pagar por el estudio. Eficiencia {formatPct(bayes.efficiency, 1)}</p>
+        </div>
+      </div>
+
+      <div className="bg-brand-cream p-6 rounded-xl border border-brand-pink">
+        <h3 className="text-lg font-semibold text-brand-ink mb-2">Eficiencia del Mercado</h3>
+        <p className="text-sm leading-relaxed text-brand-muted">
+          La información muestral presenta una eficiencia aproximada del 48,89%. Esto significa que el estudio de mercado permite obtener cerca del 49% del beneficio que se podría alcanzar si se tuviera información perfecta sobre la demanda.
+        </p>
       </div>
     </div>
   );
