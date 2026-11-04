@@ -24,7 +24,13 @@ export default function InferenciaBayesiana() {
 
       <div className="bg-brand-cream p-6 rounded-xl border border-brand-pink">
         <h3 className="text-xl font-semibold text-brand-tan mb-4">Matriz de pagos</h3>
-        <PaymentMatrix decisions={result.decisions} matrix={result.matrix} params={params} bestIdx={result.bestIdx} />
+        <PaymentMatrix
+          decisions={result.decisions}
+          matrix={result.matrix}
+          params={params}
+          bestIdx={result.bestIdx}
+          showExpectedValue
+        />
       </div>
 
       <div>
