@@ -317,6 +317,16 @@ export default function LineasDeEspera() {
           Subir c reparte la misma llegada entre más mostradores. Subir μ acelera cada canal. Las medidas de arriba son de estado estable: el arranque del día no entra en estos promedios.
         </p>
       </div>
+
+      <div className="bg-brand-cream p-6 rounded-xl border border-brand-pink space-y-3">
+        <h3 className="text-xl font-semibold text-brand-ink">Mejora Propuesta</h3>
+        <p className="text-sm text-brand-ink leading-relaxed">
+          Se propone organizar el mostrador antes de la apertura o durante los momentos de menor demanda. Las galletas disponibles se ubicarán en bandejas identificadas por sabor, se dejarán las bolsas y cajas al alcance del colaborador y se mantendrá un menú visible con los precios y las opciones disponibles. Además, se podrá dejar lista una cantidad pequeña de las presentaciones más solicitadas.
+        </p>
+        <p className="text-sm text-brand-ink leading-relaxed">
+          Con esta organización, el cliente podrá revisar las opciones mientras espera su turno. Cuando llegue al mostrador, el colaborador podrá verificar la disponibilidad, confirmar la elección y registrar el pedido sin tener que buscar los productos ni consultar repetidamente qué sabores quedan.
+        </p>
+      </div>
     </div>
   );
 }
