@@ -48,9 +48,13 @@ export default function ContextoEmpresarial() {
       <div className="bg-brand-cream p-6 rounded-xl border border-brand-pink">
         <h3 className="text-lg font-semibold text-brand-tan mb-3">El problema de decisión</h3>
         <p className="text-brand-ink text-sm leading-relaxed">
-          Chips Bakery debe fijar la producción del próximo periodo (100, 250 o 400 galletas) sin conocer la demanda.
-          Si produce de más, las unidades sobrantes se descartan por la política <span className="text-brand-ink font-medium">Horneado Hoy, Fresco Hoy</span> (merma total al costo).
-          Si produce de menos, deja de vender pero no pierde efectivo extra. El laboratorio de Inferencia Bayesiana permite cambiar precio, costo y cantidades; la matriz de pagos se actualiza con esos valores.
+          La empresa debe determinar la cantidad de galletas que producirá en el próximo mes. Esta decisión debe tomarse teniendo en cuenta que la cantidad de productos puede variar y no se conoce con certeza cuantas unidades serán solicitadas por los clientes
+          <br /><br />
+          La empresa considera 3 alternativas de solución: Producir 100, 250 o 400.
+          <br />
+          A su vez pueden presentar dos posibles escenarios de la demanda: Baja y alta
+          <br /><br />
+          Si la empresa produce una cantidad superior a la demanda, puede generar costos adicionales de los productos no vendidos, por el contrario, si produce menos, puede perder oportunidades de ventas, pero no va a generar perdidas monetarias.
         </p>
       </div>
 
